@@ -26,6 +26,11 @@ Brick::Brick(BrickType type, const sf::Vector2f& position, const sf::Vector2f& s
 		body.setOutlineColor(BRICK_OUTLINE_COLOR[undestructible]);
 		break;
 	case gm::Brick::empty:
+		hp = 0;
+		destructible = true;
+		body.setFillColor(BRICK_FILL_COLOR[hp]);
+		body.setOutlineColor(BRICK_OUTLINE_COLOR[hp]);
+		break;
 	default:
 		break;
 	}
@@ -57,6 +62,10 @@ void Brick::render(sf::RenderWindow& window, float deltaTime) {
 
 bool Brick::breakable()const {
 	return destructible;
+}
+
+int Brick::getHp()const {
+	return hp;
 }
 
 

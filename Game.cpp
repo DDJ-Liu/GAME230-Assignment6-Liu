@@ -85,20 +85,49 @@ void Game::update() {
 	}
 	if (gameState == running) {
 		if (ball.hitBorder(window) != NoBorder) {
-			ball.bounceAtWall(ball.hitBorder(window));
+			if (ball.hitBorder(window) == BottomBorder) {
+				if (life > 0) {
+					//lose life
+					life--;
+					soundManager.playSFX(SoundManager::LoseHp);
+					ball.reset(window);
+					gameState = start;
+					ui.updateHp(life);
+				}
+				else {
+					//end game
+					endGame();
+				}
+			}
+			else {
+				ball.bounceAtWall(ball.hitBorder(window));
+				soundManager.playSFX(SoundManager::BounceWall);
+			}
 		}
 		if (ball.collide(paddle.getCollider())) {
 			ball.bounceAtPeddal(paddle);
+			soundManager.playSFX(SoundManager::BouncePaddle);
 		}
 	}
 
+	/*
 	for (int i = 0; i < 3; i++) {
 		bricks[i].update(window, deltaTime);
 		if (ball.collide(bricks[i].getCollider())) {
 			ball.bounceAtBrick(ball.hitBrick(bricks[i]));
 		}
+	}*/
+
+	level.update(window, deltaTime);
+
+	if (level.handleCollide(ball,soundManager)) {
+		score += levelCount;
+		ui.updateScore(score);
 	}
 
+	if (level.isClear()) {
+		nextLevel();
+	}
 
 	// Update our boxes (i.e., move them based on the block's specified movement direction)
 	/*
@@ -138,10 +167,14 @@ void Game::render() {
 	//box2.render(window, deltaTime);
 	ball.render(window, deltaTime);
 	paddle.render(window, deltaTime);
+
+	/*
 	for (int i = 0; i < 3; i++) {
 		bricks[i].render(window, deltaTime);
-	}
+	}*/
+	level.render(window, deltaTime);
 
+	ui.render(window, deltaTime);
 	// Display the window buffer for this frame
 	window.display();
 }
@@ -157,8 +190,32 @@ void Game::initialize() {
 	paddle = Paddle(1, BottomBorder, Vector2f(window.getSize().x / 2 - PADDLE_LENGTH / 2, window.getSize().y - PADDLE_BORDER_OFFSET - PADDLE_WIDTH), Vector2f(PADDLE_LENGTH, PADDLE_WIDTH));
 	playerController = PlayerController(1, paddle, Controller::horizontal);
 
-	bricks[0] = Brick(Brick::normBrick, Vector2f(120, 60), Vector2f(BRICK_WIDTH, BRICK_HEIGHT));
-	bricks[1] = Brick(Brick::hardBrick, Vector2f(420, 60), Vector2f(BRICK_WIDTH, BRICK_HEIGHT));
-	bricks[2] = Brick(Brick::undestructible, Vector2f(270, 150), Vector2f(BRICK_WIDTH, BRICK_HEIGHT));
+	//bricks[0] = Brick(Brick::normBrick, Vector2f(120, 60), Vector2f(BRICK_WIDTH, BRICK_HEIGHT));
+	//bricks[1] = Brick(Brick::hardBrick, Vector2f(420, 60), Vector2f(BRICK_WIDTH, BRICK_HEIGHT));
+	//bricks[2] = Brick(Brick::undestructible, Vector2f(270, 150), Vector2f(BRICK_WIDTH, BRICK_HEIGHT));
+	levelCount = 1;
+	level.loadLevel(LEVELS[0]);
+	life = 2;
+	score = 0;
 
+	ui.updateLevel(levelCount);
+	ui.updateHp(life);
+	ui.updateScore(score);
+
+}
+
+void Game::nextLevel() {
+	soundManager.playSFX(SoundManager::PassLevel);
+	level.loadLevel(LEVELS[levelCount % 3]);
+	levelCount++;
+	ui.updateLevel(levelCount);
+	gameState = start;
+}
+
+void Game::endGame() {
+	soundManager.playSFX(SoundManager::GameOver);
+	gameState = endgame;
+	ball.setVelocity(Vector2f(0, 0));
+	ball.setPosition(Vector2f(GameWidth + 100, GameHeight + 100));
+	ui.endgame();
 }

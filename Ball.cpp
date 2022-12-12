@@ -6,6 +6,7 @@ using namespace sf;
 Ball::Ball(const sf::Vector2f position, const float size, const float speed):GameObject(position,Vector2f(2*size,2*size)) {
 	body.setPosition(position);
 	body.setRadius(size);
+	body.setFillColor(Color::Green);
 	protectTimer = 0;
 }
 void Ball::update(sf::RenderWindow& window, float deltatime) {
@@ -192,23 +193,24 @@ Border Ball::hitBrick(Brick& brick) {
 	return NoBorder;
 }
 
-void Ball::bounceAtBrick(Border border) {
+bool Ball::bounceAtBrick(Border border) {
 	switch (border)
 	{
 	case gm::NoBorder:
-		return;
+		return false;
 	case gm::LeftBorder:
 	case gm::RightBorder:
 		velocity.x *= -1;
-		return;
+		return true;
 	case gm::BottomBorder:
 	case gm::TopBorder:
 		velocity.y *= -1;
-		return;
+		return true;
 	default:
 		std::cout << "Wall bounce error" << std::endl;
 		break;
 	}
+	return false;
 }
 
 

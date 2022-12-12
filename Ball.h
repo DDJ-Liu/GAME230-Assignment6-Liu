@@ -34,7 +34,7 @@ namespace gm {
         Border hitBorder(const sf::RenderWindow& window);
         void stickTo(Paddle& paddle);
         Border hitBrick(Brick& brick);
-        void bounceAtBrick(Border border);
+        bool bounceAtBrick(Border border);
         ~Ball();
     };
 

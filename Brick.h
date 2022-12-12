@@ -19,6 +19,7 @@ namespace gm {
         virtual void update(sf::RenderWindow& window, float deltaTime)override;
         virtual void render(sf::RenderWindow& window, float deltaTime)override;
         bool breakable()const;
+        int getHp()const;
         ~Brick();
 
 

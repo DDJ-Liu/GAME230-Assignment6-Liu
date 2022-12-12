@@ -15,8 +15,9 @@
 
  /* Our Includes */
 #include "PlayerController.h"
-#include "Ball.h"
-#include "Brick.h"
+#include "Level.h"
+#include "UI.h"
+#include "SoundManager.h"
 
 // Place our classes, functions, variables, and so forth in their own namespace to avoid naming collisions
 namespace gm {
@@ -36,9 +37,16 @@ namespace gm {
 		Ball ball;
 		Paddle paddle;
 		PlayerController playerController;
-		Brick bricks[3];
+		//Brick bricks[3];
+		Level level;
+		int levelCount = 0;
+		int life = 2;
+		int score = 0;
 
-		enum GameState { running, start, pause };
+		UI ui;
+		SoundManager soundManager;
+
+		enum GameState { running, start, endgame };
 		GameState gameState = start;
 
 	public:
@@ -54,7 +62,8 @@ namespace gm {
 		// Destructor
 		~Game();
 		void initialize();
-		
+		void nextLevel();
+		void endGame();
 	};
 }
 
